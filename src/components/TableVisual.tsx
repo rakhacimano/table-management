@@ -1,6 +1,6 @@
 "use client";
 
-import { Table, TableStatus, TableShape, STATUS_CONFIG } from "@/types/table";
+import { TableStatus, TableShape, STATUS_CONFIG } from "@/types/table";
 
 interface TableVisualProps {
   shape: TableShape;
@@ -174,7 +174,7 @@ function getChairPositions(
 
     // Distribute evenly: top, bottom, left, right
     const sides: { side: "top" | "bottom" | "left" | "right"; count: number }[] = [];
-    let remaining = capacity;
+    const remaining = capacity;
 
     if (remaining >= 2) {
       // Divide evenly between top/bottom and left/right based on shape

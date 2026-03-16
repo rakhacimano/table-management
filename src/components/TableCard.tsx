@@ -3,7 +3,7 @@
 import { Table } from "@/types/table";
 import StatusBadge from "./StatusBadge";
 import TableVisual from "./TableVisual";
-import { Clock, UserCheck, Sparkles, AlertCircle, Edit2, Trash2, CalendarPlus } from "lucide-react";
+import { UserCheck, Sparkles, AlertCircle, Edit2, Trash2, CalendarPlus } from "lucide-react";
 
 interface TableCardProps {
   table: Table;

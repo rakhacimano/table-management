@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Table, Floor } from "@/types/table";
+import { Table } from "@/types/table";
 import { useTables } from "@/hooks/useTables";
 import TableCard from "@/components/TableCard";
 import FloorPlan from "@/components/FloorPlan";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Table, STATUS_CONFIG } from "@/types/table";
+import { Table } from "@/types/table";
 import TableVisual from "./TableVisual";
 import StatusBadge from "./StatusBadge";
 
