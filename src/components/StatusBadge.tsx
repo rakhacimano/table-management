@@ -13,37 +13,18 @@ export default function StatusBadge({ status, onClick }: StatusBadgeProps) {
   return (
     <button
       onClick={onClick}
-      className={`
-        inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold
-        ${config.bg} ${config.color} ${config.border} border
-        transition-all duration-300 ease-out
-        hover:scale-105 hover:shadow-lg ${config.glow}
-        active:scale-95
-        cursor-pointer select-none
-      `}
-      title="Click to change status"
+      className="border border-grey-50 rounded-lg px-2 py-1 bg-white hover:bg-grey-50 transition-colors"
+      title={`Status: ${config.labelId}. Click to cycle.`}
     >
-      <span className="relative flex h-2 w-2">
-        <span
-          className={`
-            animate-ping absolute inline-flex h-full w-full rounded-full opacity-75
-            ${status === "available" ? "bg-emerald-400" : ""}
-            ${status === "occupied" ? "bg-rose-400" : ""}
-            ${status === "reserved" ? "bg-amber-400" : ""}
-            ${status === "cleaning" ? "bg-slate-400" : ""}
-          `}
+      <div className="flex items-center gap-1.5">
+        <div
+          className="w-2 h-2 rounded-full"
+          style={{ backgroundColor: config.hex }}
         />
-        <span
-          className={`
-            relative inline-flex rounded-full h-2 w-2
-            ${status === "available" ? "bg-emerald-400" : ""}
-            ${status === "occupied" ? "bg-rose-400" : ""}
-            ${status === "reserved" ? "bg-amber-400" : ""}
-            ${status === "cleaning" ? "bg-slate-400" : ""}
-          `}
-        />
-      </span>
-      {config.label}
+        <span className="font-medium text-xs text-grey-500">
+          {config.labelId}
+        </span>
+      </div>
     </button>
   );
 }

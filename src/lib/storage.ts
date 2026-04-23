@@ -1,18 +1,18 @@
-import { Table, Floor, Reservation, DEFAULT_TABLES, DEFAULT_FLOORS } from "@/types/table";
+import { Table, Floor, Reservation, ReservationSettings } from "@/types/table";
 
-const TABLES_KEY = "table-manager-tables";
-const FLOORS_KEY = "table-manager-floors";
-const RESERVATIONS_KEY = "table-manager-reservations";
+const TABLES_KEY = "kaspin-table-manager-tables";
+const FLOORS_KEY = "kaspin-table-manager-floors";
+const RESERVATIONS_KEY = "kaspin-table-manager-reservations";
+const SETTINGS_KEY = "kaspin-table-manager-settings";
 
 export function getFloors(): Floor[] {
-  if (typeof window === "undefined") return DEFAULT_FLOORS;
+  if (typeof window === "undefined") return [];
   try {
     const stored = localStorage.getItem(FLOORS_KEY);
     if (stored) return JSON.parse(stored) as Floor[];
-    saveFloors(DEFAULT_FLOORS);
-    return DEFAULT_FLOORS;
+    return [];
   } catch {
-    return DEFAULT_FLOORS;
+    return [];
   }
 }
 
@@ -26,28 +26,16 @@ export function saveFloors(floors: Floor[]): void {
 }
 
 export function getTables(): Table[] {
-  if (typeof window === "undefined") return DEFAULT_TABLES;
-
+  if (typeof window === "undefined") return [];
   try {
     const stored = localStorage.getItem(TABLES_KEY);
     if (stored) {
-      // Migrate old tables missing floorId
       const parsed = JSON.parse(stored) as Table[];
-      let needsMigration = false;
-      const migrated = parsed.map(t => {
-        if (!t.floorId) {
-          needsMigration = true;
-          return { ...t, floorId: "floor-1" };
-        }
-        return t;
-      });
-      if (needsMigration) saveTables(migrated);
-      return migrated;
+      return parsed;
     }
-    saveTables(DEFAULT_TABLES);
-    return DEFAULT_TABLES;
+    return [];
   } catch {
-    return DEFAULT_TABLES;
+    return [];
   }
 }
 
@@ -77,5 +65,31 @@ export function saveReservations(reservations: Reservation[]): void {
     localStorage.setItem(RESERVATIONS_KEY, JSON.stringify(reservations));
   } catch {
     console.error("Failed to save reservations");
+  }
+}
+
+export const DEFAULT_SETTINGS: ReservationSettings = {
+  preBufferMin: 30,
+  diningDurationMin: 90,
+  postBufferMin: 15
+};
+
+export function getReservationSettings(): ReservationSettings {
+  if (typeof window === "undefined") return DEFAULT_SETTINGS;
+  try {
+    const stored = localStorage.getItem(SETTINGS_KEY);
+    if (stored) return JSON.parse(stored) as ReservationSettings;
+    return DEFAULT_SETTINGS;
+  } catch {
+    return DEFAULT_SETTINGS;
+  }
+}
+
+export function saveReservationSettings(settings: ReservationSettings): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  } catch {
+    console.error("Failed to save settings");
   }
 }

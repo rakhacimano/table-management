@@ -14,6 +14,12 @@ export interface Reservation {
   time: string; // e.g., "18:00"
 }
 
+export interface ReservationSettings {
+  preBufferMin: number;
+  diningDurationMin: number;
+  postBufferMin: number;
+}
+
 export interface Table {
   id: string;
   name: string;
@@ -23,66 +29,84 @@ export interface Table {
   floorId: string;
   x: number;
   y: number;
+  guestName?: string;
+  currentPax?: number;
+  occupiedSince?: number;
 }
 
 export const STATUS_CONFIG: Record<
   TableStatus,
   {
     label: string;
+    labelId: string;
     color: string;
     bg: string;
     border: string;
-    glow: string;
     hex: string;
     hexLight: string;
+    chairColor: string;
+    tableBg: string;
+    tableBorder: string;
   }
 > = {
   available: {
     label: "Available",
-    color: "text-emerald-400",
-    bg: "bg-emerald-500/15",
-    border: "border-emerald-500/30",
-    glow: "shadow-emerald-500/20",
-    hex: "#34d399",
-    hexLight: "#34d39930",
+    labelId: "Tersedia",
+    color: "text-info-500",
+    bg: "bg-info-50",
+    border: "border-info-100",
+    hex: "#1B84FF",
+    hexLight: "#E6F7FF",
+    chairColor: "#A8D2FF",
+    tableBg: "#E6F7FF",
+    tableBorder: "#D2EBFF",
   },
   occupied: {
     label: "Occupied",
-    color: "text-rose-400",
-    bg: "bg-rose-500/15",
-    border: "border-rose-500/30",
-    glow: "shadow-rose-500/20",
-    hex: "#fb7185",
-    hexLight: "#fb718530",
+    labelId: "Terisi",
+    color: "text-primary-500",
+    bg: "bg-primary-50",
+    border: "border-primary-100",
+    hex: "#284B63",
+    hexLight: "#EFF6FC",
+    chairColor: "#A8BAC7",
+    tableBg: "#EFF6FC",
+    tableBorder: "#D7E2EA",
   },
   reserved: {
     label: "Reserved",
-    color: "text-amber-400",
-    bg: "bg-amber-500/15",
-    border: "border-amber-500/30",
-    glow: "shadow-amber-500/20",
-    hex: "#fbbf24",
-    hexLight: "#fbbf2430",
+    labelId: "Di-booking",
+    color: "text-warning-500",
+    bg: "bg-warning-50",
+    border: "border-warning-100",
+    hex: "#F6B101",
+    hexLight: "#FFF3DD",
+    chairColor: "#FEDEA8",
+    tableBg: "#FFF3DD",
+    tableBorder: "#FFECCB",
   },
   cleaning: {
     label: "Cleaning",
-    color: "text-slate-400",
-    bg: "bg-slate-500/15",
-    border: "border-slate-500/30",
-    glow: "shadow-slate-500/20",
-    hex: "#94a3b8",
-    hexLight: "#94a3b830",
+    labelId: "Dibersihkan",
+    color: "text-grey-500",
+    bg: "bg-grey-50",
+    border: "border-grey-100",
+    hex: "#76777A",
+    hexLight: "#F5F5F6",
+    chairColor: "#C9C9CB",
+    tableBg: "#F5F5F6",
+    tableBorder: "#E6E6E7",
   },
 };
 
 export const SHAPE_CONFIG: Record<
   TableShape,
-  { label: string; icon: string }
+  { label: string; labelId: string; icon: string }
 > = {
-  square: { label: "Square", icon: "□" },
-  rectangle: { label: "Rectangle", icon: "▭" },
-  round: { label: "Round", icon: "○" },
-  booth: { label: "Booth", icon: "⊏" },
+  square: { label: "Square", labelId: "Persegi", icon: "□" },
+  rectangle: { label: "Rectangle", labelId: "Persegi Panjang", icon: "▭" },
+  round: { label: "Round", labelId: "Bulat", icon: "○" },
+  booth: { label: "Booth", labelId: "Booth", icon: "⊏" },
 };
 
 export const STATUS_ORDER: TableStatus[] = [
@@ -92,28 +116,9 @@ export const STATUS_ORDER: TableStatus[] = [
   "cleaning",
 ];
 
-function autoShape(capacity: number): TableShape {
+export function autoShape(capacity: number): TableShape {
   if (capacity <= 2) return "square";
   if (capacity <= 4) return "square";
   if (capacity <= 6) return "rectangle";
   return "round";
 }
-
-export const DEFAULT_FLOORS: Floor[] = [
-  { id: "floor-1", name: "Main Floor" },
-  { id: "floor-2", name: "Second Floor / VIP" },
-];
-
-export const DEFAULT_TABLES: Table[] = [
-  // Main Floor
-  { id: "1", name: "Table 1", capacity: 4, status: "available", shape: "square", floorId: "floor-1", x: 100, y: 100 },
-  { id: "2", name: "Table 2", capacity: 2, status: "occupied", shape: "square", floorId: "floor-1", x: 300, y: 100 },
-  { id: "3", name: "Table 3", capacity: 6, status: "reserved", shape: "rectangle", floorId: "floor-1", x: 500, y: 100 },
-  { id: "4", name: "Table 4", capacity: 4, status: "cleaning", shape: "booth", floorId: "floor-1", x: 100, y: 300 },
-  { id: "5", name: "Table 5", capacity: 4, status: "available", shape: "booth", floorId: "floor-1", x: 300, y: 300 },
-  // Second Floor
-  { id: "6", name: "VIP 1", capacity: 8, status: "available", shape: "round", floorId: "floor-2", x: 200, y: 200 },
-  { id: "7", name: "VIP 2", capacity: 8, status: "available", shape: "round", floorId: "floor-2", x: 500, y: 200 },
-];
-
-export { autoShape };

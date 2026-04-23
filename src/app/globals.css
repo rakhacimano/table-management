@@ -3,30 +3,18 @@
 @tailwind utilities;
 
 :root {
-  --background: #0a0a1a;
-  --foreground: #ededed;
+  --background: #f9f9f9;
+  --foreground: #111212;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
   min-height: 100vh;
+  font-family: "Onest", sans-serif;
 }
 
-/* Subtle background pattern */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background:
-    radial-gradient(ellipse 600px 400px at 20% 10%, rgba(139, 92, 246, 0.06), transparent),
-    radial-gradient(ellipse 500px 300px at 80% 80%, rgba(59, 130, 246, 0.04), transparent),
-    radial-gradient(ellipse 400px 300px at 50% 50%, rgba(16, 185, 129, 0.02), transparent);
-  pointer-events: none;
-}
-
-/* Custom scrollbar */
+/* Custom scrollbar — light theme */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -34,11 +22,11 @@ body::before {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.08);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.15);
 }
 
 /* Animations */
@@ -62,6 +50,17 @@ body::before {
   }
 }
 
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .animate-fadeIn {
   animation: fadeIn 0.2s ease-out;
 }
@@ -70,8 +69,26 @@ body::before {
   animation: slideUp 0.3s ease-out;
 }
 
+.animate-scaleIn {
+  animation: scaleIn 0.25s ease-out;
+}
+
 /* Selection color */
 ::selection {
-  background-color: rgba(139, 92, 246, 0.3);
-  color: white;
+  background-color: rgba(40, 75, 99, 0.2);
+  color: #111212;
 }
+
+/* Input focus ring */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+}
+
+/* Blueprint / Grid Background for Floor Plan */
+.bg-grid-pattern {
+  background-image: radial-gradient(circle at 1px 1px, rgba(40, 75, 99, 0.1) 1px, transparent 0);
+  background-size: 20px 20px;
+}
+

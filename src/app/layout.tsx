@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
-
 export const metadata: Metadata = {
-  title: "Table Manager — Venue Table Management",
+  title: "Kaspin Table Management — Informasi Ruangan",
   description:
-    "Manage your restaurant, coworking space, event venue, or meeting room tables with ease.",
+    "Kelola ruangan dan meja restoran Kaspin Djaya dengan mudah.",
 };
 
 export default function RootLayout({
@@ -19,17 +13,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="id">
       <head>
         <link
-          href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body
-        className={`${inter.variable} antialiased bg-[#0a0a1a] text-white`}
-        style={{ fontFamily: "'Google Sans', var(--font-inter), sans-serif" }}
-      >
+      <body className="antialiased bg-[#f9f9f9] text-grey-950 font-onest">
         {children}
       </body>
     </html>

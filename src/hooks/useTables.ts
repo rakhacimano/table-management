@@ -1,32 +1,49 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Table, TableStatus, TableShape, Floor, Reservation, STATUS_ORDER } from "@/types/table";
-import { getTables, saveTables, getFloors, saveFloors, getReservations, saveReservations } from "@/lib/storage";
+import { Table, TableStatus, TableShape, Floor, Reservation, ReservationSettings, STATUS_ORDER } from "@/types/table";
+import { getTables, saveTables, getFloors, saveFloors, getReservations, saveReservations, getReservationSettings, saveReservationSettings, DEFAULT_SETTINGS } from "@/lib/storage";
 
 export function useTables() {
   const [tables, setTables] = useState<Table[]>([]);
   const [floors, setFloors] = useState<Floor[]>([]);
   const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [reservationSettings, setReservationSettings] = useState<ReservationSettings>(DEFAULT_SETTINGS);
   const [activeFloorId, setActiveFloorId] = useState<string>("");
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load from localStorage on mount
+  // Load from localStorage on mount and setup real-time polling/sync
   useEffect(() => {
+    const loadState = () => {
+      setFloors(getFloors());
+      setTables(getTables());
+      setReservations(getReservations());
+      setReservationSettings(getReservationSettings());
+    };
+
+    loadState();
+
     const loadedFloors = getFloors();
-    const loadedTables = getTables();
-    const loadedReservations = getReservations();
-    
-    setFloors(loadedFloors);
-    setTables(loadedTables);
-    setReservations(loadedReservations);
-    
-    if (loadedFloors.length > 0) {
+    if (loadedFloors.length > 0 && !activeFloorId) {
       setActiveFloorId(loadedFloors[0].id);
     }
-    
     setIsLoaded(true);
-  }, []);
+
+    // Multi-tab "WebSocket" simulator using storage events
+    window.addEventListener("storage", loadState);
+    
+    // Fallback manual poll for real-time sandbox simulation (every 5s)
+    const interval = setInterval(() => {
+        // Only pull if we aren't currently overwriting (handled cleanly by React's reference comparisons if data matches)
+        // This simulates a live backend ping.
+        loadState();
+    }, 5000);
+
+    return () => {
+      window.removeEventListener("storage", loadState);
+      clearInterval(interval);
+    }
+  }, [activeFloorId]);
 
   // Persist on every change
   useEffect(() => {
@@ -34,8 +51,9 @@ export function useTables() {
       saveTables(tables);
       saveFloors(floors);
       saveReservations(reservations);
+      saveReservationSettings(reservationSettings);
     }
-  }, [tables, floors, reservations, isLoaded]);
+  }, [tables, floors, reservations, reservationSettings, isLoaded]);
 
   // Derived state
   const activeFloorTables = useMemo(
@@ -100,7 +118,28 @@ export function useTables() {
   }, []);
 
   const setTableStatus = useCallback((id: string, status: TableStatus) => {
-    setTables((prev) => prev.map((t) => (t.id === id ? { ...t, status } : t)));
+    setTables((prev) => prev.map((t) => {
+      if (t.id === id) {
+        const update = { ...t, status };
+        // Handle Operational Timer logic
+        if (status === "occupied" && t.status !== "occupied") {
+          update.occupiedSince = Date.now();
+        } else if (status !== "occupied" && status !== "cleaning") {
+           // Clear payload if it becomes completely available
+           if (status === "available") {
+             update.occupiedSince = undefined;
+             update.guestName = undefined;
+             update.currentPax = undefined;
+           }
+        }
+        return update;
+      }
+      return t;
+    }));
+  }, []);
+
+  const assignTableGuest = useCallback((id: string, guestName: string, pax: number) => {
+    setTables((prev) => prev.map((t) => (t.id === id ? { ...t, status: "occupied", guestName, currentPax: pax, occupiedSince: Date.now() } : t)));
   }, []);
 
   const updateTablePosition = useCallback((id: string, x: number, y: number) => {
@@ -119,16 +158,19 @@ export function useTables() {
   }, []);
 
   const deleteFloor = useCallback((id: string) => {
-    setFloors((prev) => prev.filter((f) => f.id !== id));
+    setFloors((prev) => {
+      const remaining = prev.filter((f) => f.id !== id);
+      // Update active floor to first remaining or empty
+      if (activeFloorId === id) {
+        setActiveFloorId(remaining.length > 0 ? remaining[0].id : "");
+      }
+      return remaining;
+    });
     setTables((prev) => prev.filter((t) => t.floorId !== id)); // Cascade delete
     setReservations((prev) => {
-      // Cleanup reservations for deleted tables
       const remainingTableIds = new Set(tables.filter(t => t.floorId !== id).map(t => t.id));
       return prev.filter(r => remainingTableIds.has(r.tableId));
     });
-    if (activeFloorId === id) {
-      setActiveFloorId("floor-1"); // fallback
-    }
   }, [activeFloorId, tables]);
 
   // Reservation actions
@@ -160,6 +202,7 @@ export function useTables() {
     deleteTable,
     cycleStatus,
     setTableStatus,
+    assignTableGuest,
     updateTablePosition,
     // Floor methods
     addFloor,
@@ -167,5 +210,7 @@ export function useTables() {
     deleteFloor,
     // Reservation methods
     addReservation,
+    reservationSettings,
+    setReservationSettings
   };
 }
