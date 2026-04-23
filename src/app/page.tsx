@@ -88,6 +88,13 @@ export default function Dashboard() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Auto-select first floor when none is active
+  useEffect(() => {
+    if (!activeFloorId && floors.length > 0) {
+      setActiveFloorId(floors[0].id);
+    }
+  }, [activeFloorId, floors, setActiveFloorId]);
   
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -363,7 +370,6 @@ export default function Dashboard() {
 
               {/* Searchable Room Dropdown (Moved to Header for compactness) */}
               <div className="relative w-full sm:w-[260px]" ref={roomDropdownRef}>
-                {!activeFloorId && floors.length > 0 && setActiveFloorId(floors[0].id)}
                 
                 <button
                   onClick={() => setRoomDropdownOpen(!roomDropdownOpen)}
