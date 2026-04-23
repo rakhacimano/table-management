@@ -1,8 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
 import { Table, Reservation, ReservationSettings } from "@/types/table";
-import { Users, Clock } from "lucide-react";
 
 interface ReservasiTimelineProps {
   tables: Table[];

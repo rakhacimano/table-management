@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Table, STATUS_CONFIG, SHAPE_CONFIG, TableStatus } from "@/types/table";
+import { Table, STATUS_CONFIG, TableStatus } from "@/types/table";
 import { Edit2, Trash2, X, Timer, CheckCircle, SprayCan, ArrowRightLeft, UserCircle } from "lucide-react";
 
 interface DetailMejaProps {
@@ -15,19 +15,14 @@ interface DetailMejaProps {
 }
 
 export default function DetailMeja({ table, floorName, onEdit, onDelete, onClose, onUpdateStatus, onAssignGuest }: DetailMejaProps) {
-  if (!table) return null;
-
-  const statusConf = STATUS_CONFIG[table.status];
-  const shapeConf = SHAPE_CONFIG[table.shape];
-
   const [durationStr, setDurationStr] = useState<string>("");
   const [showAssignMode, setShowAssignMode] = useState(false);
   const [guestName, setGuestName] = useState("");
-  const [paxCount, setPaxCount] = useState(table.capacity);
+  const [paxCount, setPaxCount] = useState(table?.capacity ?? 1);
 
   // Live Timer Polling Loop
   useEffect(() => {
-    if (table.status !== "occupied" || !table.occupiedSince) {
+    if (!table || table.status !== "occupied" || !table.occupiedSince) {
       setDurationStr("");
       return;
     }
@@ -47,7 +42,11 @@ export default function DetailMeja({ table, floorName, onEdit, onDelete, onClose
     updateTimer(); // fire immediately
     const int = setInterval(updateTimer, 1000);
     return () => clearInterval(int);
-  }, [table.status, table.occupiedSince]);
+  }, [table?.status, table?.occupiedSince, table]);
+
+  if (!table) return null;
+
+  const statusConf = STATUS_CONFIG[table.status];
 
   const handleAssign = () => {
     if (!guestName.trim()) return;

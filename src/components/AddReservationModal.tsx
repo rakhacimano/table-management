@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { X, Clock, CalendarIcon, Users } from "lucide-react";
+import { X, Clock, Users } from "lucide-react";
 import { Table, Floor, Reservation, ReservationSettings } from "@/types/table";
 
 interface AddReservationModalProps {
